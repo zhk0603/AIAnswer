@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.IO;
 
-namespace AIAnswer.Helper
+namespace AIAnswer
 {
     public class ImageHelper
     {
@@ -15,8 +15,8 @@ namespace AIAnswer.Helper
                     using (var graphic = Graphics.FromImage(bitMap))
                     {
                         graphic.DrawImage(fromImage, 0, 0, new Rectangle(offsetX, offsetY, width, height), GraphicsUnit.Pixel);
-                        var ms = new System.IO.MemoryStream();
-                        bitMap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        var ms = new MemoryStream();
+                        bitMap.Save(ms, System.Drawing.Imaging.ImageFormat.Tiff);
                         ms.Seek(0, SeekOrigin.Begin);
                         return ms;
                     }

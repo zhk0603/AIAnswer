@@ -46,10 +46,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helper\ImageHelper.cs" />
+    <Compile Include="BaiduOcrSvc.cs" />
+    <Compile Include="ImageHelper.cs" />
     <Compile Include="IOcrService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TesseractSvc.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -7,16 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using AIAnswer.Helper;
 using Tesseract;
 
 namespace AIAnswer.Forms
 {
     public partial class Form1 : Form
     {
+        private readonly TesseractEngine _engine;
         public Form1()
         {
             InitializeComponent();
+            _engine = new TesseractEngine(@"./tessdata", "chi_sim", EngineMode.Default);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -29,11 +30,7 @@ namespace AIAnswer.Forms
                 var bitmap = new Bitmap(image);
                 pictureBox1.Image = bitmap;
                 pictureBox1.Image.Save(@"C:\Users\Administrator\Desktop\images\tmp.jpeg");
-
-                var engine = new TesseractEngine(@"./tessdata", "chi_sim", EngineMode.Default);
-
-                Page tmpPage = engine.Process(bitmap, pageSegMode: engine.DefaultPageSegMode);
-
+                Page tmpPage = _engine.Process(bitmap, pageSegMode: _engine.DefaultPageSegMode);
                 var txt = tmpPage.GetText();
                 MessageBox.Show(txt);
             }
