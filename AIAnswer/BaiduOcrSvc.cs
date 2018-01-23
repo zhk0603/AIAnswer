@@ -4,19 +4,48 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace AIAnswer
 {
-    public class BaiduOcrSvc : IOcrService
+    public class BaiduOcrSvc : OcrServiceBase
     {
-        public void Init()
+        private Baidu.Aip.Ocr.Ocr _ocrSvc;
+
+        public override void Init()
         {
-            throw new NotImplementedException();
+            var appKey = System.Configuration.ConfigurationManager.AppSettings["ApiKey"];
+            var secretKey = System.Configuration.ConfigurationManager.AppSettings["SecretKey"];
+            _ocrSvc = new Baidu.Aip.Ocr.Ocr(appKey, secretKey);
         }
 
-        public string Process(Stream stream)
+        protected override Problem ProcessCore(Stream stream)
         {
-            throw new NotImplementedException();
+            byte[] bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, bytes.Length);
+            stream.Seek(0, SeekOrigin.Begin);
+            var json = _ocrSvc.GeneralBasic(bytes);
+
+            JToken[] wordArr = json["words_result"].ToArray();
+
+            var title = string.Empty;
+            var titleIndex = wordArr.Length - 5;
+            for (var i = 0; i <= titleIndex; i++)
+            {
+                title += wordArr[i]["words"].ToString();
+            }
+
+            var answereList = new List<Answer>();
+            for (var i = titleIndex + 1; i < wordArr.Length; i++)
+            {
+                answereList.Add(new Answer
+                {
+                    Order = answereList.Count + 1,
+                    Title = wordArr[i]["words"].ToString()
+                });
+            }
+
+            return new Problem(title, answereList);
         }
     }
 }

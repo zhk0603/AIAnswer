@@ -9,6 +9,6 @@ namespace AIAnswer
     public interface IOcrService
     {
         void Init();
-        string Process(System.IO.Stream stream);
+        Problem Process(System.IO.Stream stream);
     }
 }

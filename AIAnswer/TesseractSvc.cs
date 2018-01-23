@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace AIAnswer
 {
-    public class TesseractSvc : IOcrService
+    public class TesseractSvc : OcrServiceBase
     {
-        public void Init()
+        public override void Init()
         {
             throw new NotImplementedException();
         }
 
-        public string Process(Stream stream)
+        protected override Problem ProcessCore(Stream stream)
         {
             throw new NotImplementedException();
         }
