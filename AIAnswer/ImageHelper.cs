@@ -8,23 +8,6 @@ namespace AIAnswer
 {
     public class ImageHelper
     {
-        public static MemoryStream CutImage(Stream stream)
-        {
-            stream.Seek(0, SeekOrigin.Begin);
-            using (Image fromImage = Image.FromStream(stream))
-            {
-                using (var bitmap = new Bitmap(1080, 1280))
-                {
-                    using (var g = Graphics.FromImage(bitmap))
-                    {
-                        //g.DrawImage(fromImage, 0, 490, new Rectangle(offsetX, offsetY, width, height), GraphicsUnit.Pixel);
-
-                    }
-                }
-            }
-
-            return null;
-        }
         public static MemoryStream CaptureImage(Stream stream, int offsetX, int offsetY, int width, int height)
         {
             stream.Seek(0, SeekOrigin.Begin);

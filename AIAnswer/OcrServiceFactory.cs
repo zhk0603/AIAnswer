@@ -11,14 +11,19 @@ namespace AIAnswer
         public static IOcrService Create()
         {
             var type = System.Configuration.ConfigurationManager.AppSettings["OcrType"];
+            IOcrService svc;
             switch (type)
             {
                 case "Tesseract":
-                    return new TesseractSvc();
+                    svc = new TesseractSvc();
+                    break;
                 case "BaiDu":
                 default:
-                    return new BaiduOcrSvc();
+                    svc = new BaiduOcrSvc();
+                    break;
             }
+            svc.Init();
+            return svc;
         }
     }
 }

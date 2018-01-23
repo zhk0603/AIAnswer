@@ -12,7 +12,6 @@ namespace AIAnswer
         static void Main(string[] args)
         {
             var ocrSvc = OcrServiceFactory.Create();
-            ocrSvc.Init();
 
             while (true)
             {
