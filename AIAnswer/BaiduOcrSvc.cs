@@ -24,9 +24,15 @@ namespace AIAnswer
             byte[] bytes = new byte[stream.Length];
             stream.Read(bytes, 0, bytes.Length);
             stream.Seek(0, SeekOrigin.Begin);
+
             var json = _ocrSvc.GeneralBasic(bytes);
 
             JToken[] wordArr = json["words_result"].ToArray();
+
+            if (wordArr.Length < 5)
+            {
+                throw new Exception("题目解析错误");
+            }
 
             var title = string.Empty;
             var titleIndex = wordArr.Length - 5;

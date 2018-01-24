@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -22,8 +23,11 @@ namespace AIAnswer
                         graphic.FillRectangle(whiteBrush, 0, 400, 180, height);
                         graphic.FillRectangle(whiteBrush, width - 180, 400, 180, height);
 
+                        // 压缩 
+                        var compressBitmap = PercentImage(bitMap, 0.6);
+
                         // 灰度处理
-                        var grayBitmap = RgbToGrayScale(bitMap);
+                        var grayBitmap = RgbToGrayScale(compressBitmap);
 
                         var ms = new MemoryStream();
                         grayBitmap.Save(ms, ImageFormat.Jpeg);
@@ -33,6 +37,7 @@ namespace AIAnswer
                 }
             }
         }
+
         public static Bitmap RgbToGrayScale(Bitmap original)
         {
             if (original != null)
@@ -139,6 +144,29 @@ namespace AIAnswer
             bitmap.Palette = palette;
 
             return bitmap;
+        }
+
+        public static Bitmap PercentImage(Image srcImage, double percent)
+        {
+            // 缩小后的高度 
+            int newH = int.Parse(Math.Round(srcImage.Height * percent).ToString());
+            // 缩小后的宽度 
+            int newW = int.Parse(Math.Round(srcImage.Width * percent).ToString());
+            try
+            {
+                // 要保存到的图片 
+                Bitmap b = new Bitmap(newW, newH);
+                Graphics g = Graphics.FromImage(b);
+                // 插值算法的质量 
+                g.InterpolationMode = InterpolationMode.Default;
+                g.DrawImage(srcImage, new Rectangle(0, 0, newW, newH), new Rectangle(0, 0, srcImage.Width, srcImage.Height), GraphicsUnit.Pixel);
+                g.Dispose();
+                return b;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

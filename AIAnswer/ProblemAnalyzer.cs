@@ -9,6 +9,11 @@ namespace AIAnswer
 {
     public class ProblemAnalyzer
     {
+        private static long _problemCnt;
+        private static long[] _answerCnt;
+        private static long[] _problemAndAnswerCnt;
+
+
         public static void Analyzer(Problem problem)
         {
             var sw = new System.Diagnostics.Stopwatch();
@@ -16,11 +21,22 @@ namespace AIAnswer
             Console.WriteLine("开始分析……");
 
             var taskList = new List<Task>();
+
+            var analyzerProblemTask =
+                Task.Factory.StartNew(RunAnalyzer,
+                    new AnalyzerItem {ProblemTitle = problem.Title, Type = AnalyzerType.分析问题});
+            taskList.Add(analyzerProblemTask);
+
             foreach (var item in problem.Answer)
             {
-                var analyzerItem = new AnalyzerItem {ProblemTitle = problem.Title, Answer = item};
-                var task = Task.Factory.StartNew(RunAnalyzer, analyzerItem);
-                taskList.Add(task);
+                var task1 = Task.Factory.StartNew(RunAnalyzer,
+                    new AnalyzerItem {ProblemTitle = problem.Title, Answer = item, Type = AnalyzerType.分析答案});
+
+                var task2 = Task.Factory.StartNew(RunAnalyzer,
+                    new AnalyzerItem {ProblemTitle = problem.Title, Answer = item, Type = AnalyzerType.分析问题与答案});
+
+                taskList.Add(task1);
+                taskList.Add(task2);
             }
 
             Task.WaitAll(taskList.ToArray());
@@ -34,20 +50,42 @@ namespace AIAnswer
         {
             var item = obj as AnalyzerItem;
 
-            var keyWord = $"{item.ProblemTitle} {item.Answer.Title}";
+            var keyWord = string.Empty;
+            switch (item.Type)
+            {
+                case AnalyzerType.分析问题:
+                    keyWord = item.ProblemTitle;
+                    break;
+                case AnalyzerType.分析答案:
+                    keyWord = item.Answer.Title;
+                    break;
+                case AnalyzerType.分析问题与答案:
+                    keyWord = $"{item.ProblemTitle} {item.Answer.Title}";
+                    break;
+            }
 
-            Console.WriteLine($"分析：{item.Answer.Title}");
+            Console.WriteLine($"分析：{keyWord}");
             var searchUrl = "https://www.baidu.com/s?ie=utf-8&w=" +
                             System.Web.HttpUtility.UrlEncode(keyWord, Encoding.UTF8);
 
-            var problenAndAnswerCnt = GetSearchCnt(searchUrl);
-            item.Answer.Pmi = problenAndAnswerCnt;
-            Console.WriteLine($"分析：{item.Answer.Title} 结束，搜索结果：{problenAndAnswerCnt}");
+            var searchCnt = GetSearchCnt(searchUrl);
+            switch (item.Type)
+            {
+                case AnalyzerType.分析问题:
+                    _problemCnt = searchCnt;
+                    break;
+                case AnalyzerType.分析答案:
+
+                    break;
+                case AnalyzerType.分析问题与答案:
+
+                    break;
+            }
         }
 
         public static long GetSearchCnt(string url)
         {
-            var searchRes = HttpHelper.GetAsync(url).GetAwaiter().GetResult();
+            var searchRes = HttpHelper.GetAsync(url).Result;
             var match = Regex.Match(searchRes, "百度为您找到相关结果约([^']*)个");
             if (match.Success)
             {
@@ -59,7 +97,15 @@ namespace AIAnswer
 
     public class AnalyzerItem
     {
+        public AnalyzerType Type { get; set; }
         public string ProblemTitle { get; set; }
         public Answer Answer { get; set; }
+    }
+
+    public enum AnalyzerType
+    {
+        分析问题,
+        分析答案,
+        分析问题与答案
     }
 }
